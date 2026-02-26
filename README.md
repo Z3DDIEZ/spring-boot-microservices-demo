@@ -4,6 +4,15 @@ Meridian is a production-grade, event-driven microservices platform demonstratin
 
 **Core Value Proposition**: Demonstrates mastery of microservices orchestration, message-driven architecture, OAuth2 security, and distributed observability—the exact patterns tested in senior backend interviews.
 
+## Current Progress
+
+- [x] **Auth Service**: Implemented with Spring Security, JWT, BCrypt, and PostgreSQL mapping.
+- [ ] **Order Service**: Planned
+- [ ] **API Gateway**: Planned
+- [ ] **Inventory Service**: Planned
+- [ ] **Notification Service**: Planned
+- [ ] **Analytics Service**: Planned
+
 ## Documentation
 
 - [Architecture Overview](docs/architecture-overview.md)
