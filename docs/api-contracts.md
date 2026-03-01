@@ -37,14 +37,16 @@
 
 **Purpose**: Product catalog management, stock tracking, inventory reservations; consumes order events to update stock levels.
 
-| Method | Endpoint                      | Description              | Request Body                                                | Response                                                         |
-| ------ | ----------------------------- | ------------------------ | ----------------------------------------------------------- | ---------------------------------------------------------------- |
-| POST   | `/products`                   | Create product (ADMIN)   | `{ "name": "Mouse", "price": 29.99, "stockQuantity": 100 }` | `{ "productId": "uuid", "name": "Mouse" }`                       |
-| GET    | `/products`                   | List products            | Query: `?category=Electronics&page=0&size=20`               | `{ "content": [...], "totalPages": 5 }`                          |
-| GET    | `/products/{id}`              | Get product details      | -                                                           | `{ "productId": "uuid", "name": "Mouse", "stockQuantity": 100 }` |
-| PUT    | `/products/{id}`              | Update product (ADMIN)   | `{ "price": 24.99 }`                                        | `{ "productId": "uuid", "price": 24.99 }`                        |
-| GET    | `/products/{id}/availability` | Check stock              | -                                                           | `{ "productId": "uuid", "availableQuantity": 95 }`               |
-| POST   | `/products/{id}/reserve`      | Reserve stock (internal) | `{ "orderId": "uuid", "quantity": 2 }`                      | `{ "reservationId": "uuid", "reserved": true }`                  |
+**Base Path**: `/api/v1/products`
+
+| Method | Endpoint                        | Description              | Request Body                                                | Response                                                         |
+| ------ | ------------------------------- | ------------------------ | ----------------------------------------------------------- | ---------------------------------------------------------------- |
+| POST   | `/api/v1/products`              | Create product (ADMIN)   | `{ "name": "Mouse", "price": 29.99, "stockQuantity": 100 }` | `{ "productId": "uuid", "name": "Mouse" }`                       |
+| GET    | `/api/v1/products`              | List products            | Query: `?category=Electronics&page=0&size=20`               | `{ "content": [...], "totalPages": 5 }`                          |
+| GET    | `/api/v1/products/{id}`         | Get product details      | -                                                           | `{ "productId": "uuid", "name": "Mouse", "stockQuantity": 100 }` |
+| PUT    | `/api/v1/products/{id}`         | Update product (ADMIN)   | `{ "price": 24.99 }`                                        | `{ "productId": "uuid", "price": 24.99 }`                        |
+| GET    | `/api/v1/products/{id}/avail`   | Check stock              | -                                                           | `{ "productId": "uuid", "availableQuantity": 95 }`               |
+| POST   | `/api/v1/products/{id}/reserve` | Reserve stock (internal) | `{ "orderId": "uuid", "quantity": 2 }`                      | `{ "reservationId": "uuid", "reserved": true }`                  |
 
 ## Analytics Service (GraphQL)
 

@@ -1,0 +1,49 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: inventory-service
+
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USERNAME:meridian}:${MONGO_PASSWORD:changeme}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:inventory_db}?authSource=admin
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:meridian}
+    password: ${RABBITMQ_PASSWORD:changeme}
+
+jwt:
+  # Base64 encoded secret. Keep sync with auth-service.
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+
+app:
+  rabbitmq:
+    exchange:
+      orders: orders.exchange
+      inventory: inventory.exchange
+    queue:
+      order-created: order.created.queue
+      inventory-reserved: inventory.reserved.queue
+    routing-key:
+      order-created: order.created
+      inventory-reserved: inventory.reserved
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  level:
+    com.meridian.inventoryservice: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: INFO

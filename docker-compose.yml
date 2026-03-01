@@ -15,6 +15,27 @@ services:
       - redis
       # Normally we'd include auth-service and order-service depending on routing needs
 
+  # Inventory Service
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      MONGO_USERNAME: meridian
+      MONGO_PASSWORD: changeme
+      MONGO_DB: inventory_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: meridian
+      RABBITMQ_PASSWORD: changeme
+    depends_on:
+      - mongodb
+      - rabbitmq
+
   # Databases
   postgres-auth:
     image: postgres:18
