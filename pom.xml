@@ -28,7 +28,7 @@
 
     <modules>
         <!-- Uncomment each module as its pom.xml is scaffolded -->
-        <!-- <module>api-gateway</module> -->
+        <module>api-gateway</module>
         <module>auth-service</module>
         <module>order-service</module>
         <!-- <module>inventory-service</module> -->
