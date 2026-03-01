@@ -21,10 +21,11 @@ Meridian is a production-grade, event-driven microservices platform demonstratin
 
 - [x] **Auth Service** -- Spring Security, JWT (access + refresh tokens), BCrypt, PostgreSQL, unit tests
 - [x] **Order Service** -- REST API, Transactional Outbox Pattern, RabbitMQ producer, domain events, unit tests
-- [ ] **API Gateway** -- Spring Cloud Gateway, JWT validation filter, rate limiting
-- [ ] **Inventory Service** -- MongoDB, event consumer, stock reservations
+- [x] **API Gateway** -- Spring Cloud Gateway, JWT validation filter, rate limiting, circuit breakers
+- [x] **Inventory Service** -- MongoDB, event consumer, stock reservations, validation
 - [ ] **Notification Service** -- Email notifications, DLQ handling
 - [ ] **Analytics Service** -- GraphQL, InfluxDB, time-series metrics
+- [x] **Shared Library** -- Centralized domain events and DTOs to enforce schema consistency
 
 ## Project Structure
 
@@ -34,11 +35,11 @@ meridian-backend/
   docker-compose.yml       # Infrastructure containers
   auth-service/            # OAuth2 authorization server
   order-service/           # Order management + outbox events
-  api-gateway/             # (planned) Single entry point
-  inventory-service/       # (planned) Product catalog
+  api-gateway/             # Gateway with Resilience4j & Redis rate limiting
+  inventory-service/       # Product catalog & stock reservation
   notification-service/    # (planned) Async email
   analytics-service/       # (planned) GraphQL metrics
-  shared-lib/              # (planned) Shared types
+  shared-lib/              # Shared types and domain events
   docs/                    # Architecture documentation
   AG-docs/                 # Internal planning artifacts
 ```
@@ -46,6 +47,7 @@ meridian-backend/
 ## Architecture Highlights
 
 - **Clean Architecture**: Each service enforces Domain -> Application -> Infrastructure -> Presentation layering with strict dependency rules.
+- **Centralized Shared Data Types (`shared-lib`)**: Initially, domain events (like `OrderCreatedEvent`) were duplicated across services during early scaffolding—a lapse in judgment that contradicted the initial design blueprints. This has been corrected by extracting a `shared-lib` module. This ensures strict schema consistency between publishers and consumers without duplicate classes, eliminating deserialization mismatches.
 - **Transactional Outbox Pattern**: Order creation and domain event persistence happen in a single `@Transactional` boundary, guaranteeing at-least-once delivery even if RabbitMQ is temporarily unavailable.
 - **Stateless JWT Security**: Access tokens are short-lived; refresh tokens are rotated in PostgreSQL with one-use semantics.
 - **Event-Driven Communication**: Services communicate asynchronously via RabbitMQ topic exchanges. No synchronous inter-service HTTP calls.
@@ -67,6 +69,14 @@ meridian-backend/
 | POST   | `/api/v1/orders`      | Create a new order               | JWT  |
 | GET    | `/api/v1/orders`      | List authenticated user's orders | JWT  |
 | GET    | `/api/v1/orders/{id}` | Get order by ID                  | JWT  |
+
+### Inventory Service (port 8083)
+
+| Method | Endpoint                | Description                 | Auth   |
+| ------ | ----------------------- | --------------------------- | ------ |
+| POST   | `/api/v1/products`      | Create a new product        | ADMIN  |
+| GET    | `/api/v1/products`      | List all available products | Public |
+| GET    | `/api/v1/products/{id}` | Get product by ID           | Public |
 
 ## Running Locally
 

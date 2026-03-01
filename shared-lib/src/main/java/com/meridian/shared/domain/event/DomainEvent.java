@@ -1,4 +1,4 @@
-package com.meridian.order.domain;
+package com.meridian.shared.domain.event;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -60,14 +60,15 @@
 
 ## Service Boundaries (Domain-Driven Design)
 
-| Service                  | Bounded Context       | Aggregate Root | Responsibilities                                   |
-| ------------------------ | --------------------- | -------------- | -------------------------------------------------- |
-| **Auth Service**         | Identity & Access     | User           | User registration, authentication, token issuance  |
-| **Order Service**        | Order Management      | Order          | Order creation, status updates, saga orchestration |
-| **Inventory Service**    | Stock Management      | Product        | Product catalog, stock tracking, reservations      |
-| **Notification Service** | Communication         | Notification   | Email/SMS delivery, notification history           |
-| **Analytics Service**    | Business Intelligence | Metric         | Real-time metrics, GraphQL queries, dashboards     |
-| **API Gateway**          | Edge Service          | N/A            | Routing, auth, rate limiting, circuit breaking     |
+| Service                  | Bounded Context       | Aggregate Root | Responsibilities                                                |
+| ------------------------ | --------------------- | -------------- | --------------------------------------------------------------- |
+| **Auth Service**         | Identity & Access     | User           | User registration, authentication, token issuance               |
+| **Order Service**        | Order Management      | Order          | Order creation, status updates, saga orchestration              |
+| **Inventory Service**    | Stock Management      | Product        | Product catalog, stock tracking, reservations                   |
+| **Notification Service** | Communication         | Notification   | Email/SMS delivery, notification history                        |
+| **Analytics Service**    | Business Intelligence | Metric         | Real-time metrics, GraphQL queries, dashboards                  |
+| **API Gateway**          | Edge Service          | N/A            | Routing, auth, rate limiting, circuit breaking                  |
+| **Shared Library**       | Cross-Cutting         | Events         | Centralized definitions for shared Types to prevent duplication |
 
 ## Communication Patterns
 

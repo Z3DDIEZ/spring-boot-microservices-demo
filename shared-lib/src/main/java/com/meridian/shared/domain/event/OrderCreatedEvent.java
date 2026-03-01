@@ -1,4 +1,4 @@
-package com.meridian.order.domain;
+package com.meridian.shared.domain.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
