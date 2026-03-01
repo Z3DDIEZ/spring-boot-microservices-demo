@@ -36,11 +36,11 @@ public class AuthService {
     private final long refreshTokenDurationMs;
 
     public AuthService(AuthenticationManager authenticationManager,
-                       UserRepository userRepository,
-                       RefreshTokenRepository refreshTokenRepository,
-                       PasswordEncoder passwordEncoder,
-                       JwtTokenProvider tokenProvider,
-                       @Value("${jwt.refresh-expiration}") long refreshTokenDurationMs) {
+            UserRepository userRepository,
+            RefreshTokenRepository refreshTokenRepository,
+            PasswordEncoder passwordEncoder,
+            JwtTokenProvider tokenProvider,
+            @Value("${jwt.refresh-expiration}") long refreshTokenDurationMs) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
@@ -75,15 +75,13 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+                        loginRequest.getPassword()));
 
         String jwt = tokenProvider.generateToken(authentication);
-        
-        org.springframework.security.core.userdetails.User principal = 
-                (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-                
+
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) authentication
+                .getPrincipal();
+
         User user = userRepository.findByUsername(principal.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -126,15 +124,16 @@ public class AuthService {
                 })
                 .map(RefreshToken::getUser)
                 .map(user -> {
-                    String token = tokenProvider.generateToken(new UsernamePasswordAuthenticationToken(user.getUsername(), null, List.of())); 
-                    // Note: usually we'd pass authorities properly, let's fix that
                     List<GrantedAuthority> authorities = user.getRoles().stream()
-                            .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(role.name()))
+                            .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(
+                                    role.name()))
                             .collect(Collectors.toList());
-                    
-                    org.springframework.security.core.userdetails.User principal = new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
-                    String newAccessToken = tokenProvider.generateToken(new UsernamePasswordAuthenticationToken(principal, null, authorities));
-                    
+
+                    org.springframework.security.core.userdetails.User principal = new org.springframework.security.core.userdetails.User(
+                            user.getUsername(), user.getPassword(), authorities);
+                    String newAccessToken = tokenProvider
+                            .generateToken(new UsernamePasswordAuthenticationToken(principal, null, authorities));
+
                     return new TokenRefreshResponse(newAccessToken, requestRefreshToken);
                 })
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));

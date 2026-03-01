@@ -27,6 +27,16 @@ The `infrastructure` package binds our application to the actual database and Me
 - **`JacksonConfig.java`**: Configures the JSON serializer to properly format standard `LocalDateTime` objects.
 - **`EventPublisher.java`**: A clean wrapper abstracting the `RabbitTemplate`, exposing a simple `publishEvent(type, payload)` method to the application layer.
 
-## Presentation & API (Pending)
+## Presentation & API
 
-- _(To be implemented)_: `OrderController.java` to expose the REST endpoints (`POST /orders`, `GET /orders`, etc.) and the corresponding DTOs.
+The `presentation` package exposes the HTTP surface area.
+
+- **`OrderController.java`**: The `@RestController` mapped to `/api/v1/orders`. Exposes `POST /` (create order, 201), `GET /` (list authenticated user's orders), and `GET /{id}` (single order by ID, 404 if missing). Extracts `userId` from the JWT subject claim via `@AuthenticationPrincipal Jwt`.
+- **`GlobalExceptionHandler.java`**: A `@RestControllerAdvice` providing consistent JSON error shapes for validation failures (400), not-found (404), and unexpected errors (500).
+- **`dto/CreateOrderRequest.java`**: Incoming DTO with Bean Validation (`@NotEmpty`, `@Min`, `@DecimalMin`) for order creation requests.
+- **`dto/OrderResponse.java`**: Outgoing DTO with a `fromEntity(Order)` factory method mapping domain entities to REST payloads.
+- **`dto/OrderItemResponse.java`**: Outgoing DTO representing a single line item.
+
+## Security
+
+- **`SecurityConfig.java`**: Configures the Order Service as a stateless OAuth2 Resource Server (JWT). Actuator health endpoints are open; all `/api/**` routes require authentication.

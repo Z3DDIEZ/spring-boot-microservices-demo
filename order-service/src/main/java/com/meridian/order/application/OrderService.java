@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,11 +29,17 @@ public class OrderService {
     private final ObjectMapper objectMapper;
 
     /**
-     * Creates a new Order, saves it to the DB, and generates the corresponding DomainEvent
+     * Creates a new Order, saves it to the DB, and generates the corresponding
+     * DomainEvent
      * into the Outbox table within a single atomic transaction.
+     *
+     * @param userId       the authenticated user placing the order
+     * @param itemRequests the line items with product, quantity, and price
+     *                     information
+     * @return the persisted Order entity
      */
     @Transactional
-    public Order createOrder(UUID userId, List<OrderItemRequest> itemRequests) {
+    public Order createOrder(UUID userId, List<OrderItemInput> itemRequests) {
         log.info("Creating new order for user {}", userId);
 
         // 1. Calculate totals and build OrderItems
@@ -40,16 +47,16 @@ public class OrderService {
         Order order = new Order();
         order.setUserId(userId);
 
-        for (OrderItemRequest req : itemRequests) {
-            BigDecimal itemTotal = req.getUnitPrice().multiply(BigDecimal.valueOf(req.getQuantity()));
+        for (OrderItemInput req : itemRequests) {
+            BigDecimal itemTotal = req.unitPrice().multiply(BigDecimal.valueOf(req.quantity()));
             totalAmount = totalAmount.add(itemTotal);
 
             OrderItem item = OrderItem.builder()
-                    .productId(req.getProductId())
-                    .quantity(req.getQuantity())
-                    .unitPrice(req.getUnitPrice())
+                    .productId(req.productId())
+                    .quantity(req.quantity())
+                    .unitPrice(req.unitPrice())
                     .build();
-            
+
             order.addItem(item);
         }
 
@@ -89,14 +96,32 @@ public class OrderService {
         return savedOrder;
     }
 
-    // A simple DTO wrapper for internal passing, normally this lives in presentation layer 
-    // but we use it here to decouple the HTTP request from the exact domain shape.
-    @lombok.Data
-    @lombok.AllArgsConstructor
-    @lombok.NoArgsConstructor
-    public static class OrderItemRequest {
-        private UUID productId;
-        private Integer quantity;
-        private BigDecimal unitPrice;
+    /**
+     * Retrieves a single order by its ID.
+     *
+     * @param orderId the UUID of the order
+     * @return an Optional containing the order if found, empty otherwise
+     */
+    @Transactional(readOnly = true)
+    public Optional<Order> getOrderById(UUID orderId) {
+        return orderRepository.findById(orderId);
+    }
+
+    /**
+     * Retrieves all orders belonging to a specific user, sorted newest first.
+     *
+     * @param userId the UUID of the user
+     * @return a list of orders for the given user
+     */
+    @Transactional(readOnly = true)
+    public List<Order> getOrdersByUserId(UUID userId) {
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    }
+
+    /**
+     * Immutable input record used by the controller to pass item data
+     * into the application layer without coupling to presentation DTOs.
+     */
+    public record OrderItemInput(UUID productId, Integer quantity, BigDecimal unitPrice) {
     }
 }

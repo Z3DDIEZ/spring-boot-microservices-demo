@@ -27,13 +27,14 @@
     </properties>
 
     <modules>
-        <module>api-gateway</module>
+        <!-- Uncomment each module as its pom.xml is scaffolded -->
+        <!-- <module>api-gateway</module> -->
         <module>auth-service</module>
         <module>order-service</module>
-        <module>inventory-service</module>
-        <module>notification-service</module>
-        <module>analytics-service</module>
-        <module>shared-lib</module>
+        <!-- <module>inventory-service</module> -->
+        <!-- <module>notification-service</module> -->
+        <!-- <module>analytics-service</module> -->
+        <!-- <module>shared-lib</module> -->
     </modules>
 
     <dependencyManagement>

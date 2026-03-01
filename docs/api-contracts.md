@@ -14,15 +14,24 @@
 
 ## Order Service
 
-**Purpose**: Core business logic for order management; orchestrates saga pattern, publishes order events, implements outbox pattern.
+**Purpose**: Core business logic for order management; publishes domain events via Transactional Outbox Pattern, implements saga-ready architecture.
 
-| Method | Endpoint              | Description        | Request Body                                          | Response                                                                     |
-| ------ | --------------------- | ------------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
-| POST   | `/orders`             | Create new order   | `{ "items": [{"productId": "uuid", "quantity": 2}] }` | `{ "orderId": "uuid", "status": "PENDING", "total": 99.98 }`                 |
-| GET    | `/orders`             | List user's orders | Query: `?page=0&size=20`                              | `{ "content": [...], "totalPages": 5 }`                                      |
-| GET    | `/orders/{id}`        | Get order details  | -                                                     | `{ "id": "uuid", "status": "CONFIRMED", "items": [...] }`                    |
-| PUT    | `/orders/{id}/cancel` | Cancel order       | -                                                     | `{ "id": "uuid", "status": "CANCELLED" }`                                    |
-| GET    | `/orders/{id}/status` | Get order status   | -                                                     | `{ "id": "uuid", "status": "SHIPPED", "updatedAt": "2026-02-26T10:00:00Z" }` |
+**Base Path**: `/api/v1/orders`
+
+### Implemented Endpoints
+
+| Method | Endpoint              | Description        | Request Body                                                              | Response                                                                                                                                       |
+| ------ | --------------------- | ------------------ | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/api/v1/orders`      | Create new order   | `{ "items": [{"productId": "uuid", "quantity": 2, "unitPrice": 10.00}] }` | `201`: `{ "id": "uuid", "userId": "uuid", "status": "PENDING", "totalAmount": 20.00, "items": [...], "createdAt": "...", "updatedAt": "..." }` |
+| GET    | `/api/v1/orders`      | List user's orders | - (userId extracted from JWT subject)                                     | `200`: `[{ "id": "uuid", "userId": "uuid", "status": "PENDING", "totalAmount": 20.00, "items": [...] }]`                                       |
+| GET    | `/api/v1/orders/{id}` | Get order details  | -                                                                         | `200`: `{ "id": "uuid", ... }` or `404`                                                                                                        |
+
+### Planned Endpoints
+
+| Method | Endpoint                     | Description      | Status  |
+| ------ | ---------------------------- | ---------------- | ------- |
+| PUT    | `/api/v1/orders/{id}/cancel` | Cancel order     | Planned |
+| GET    | `/api/v1/orders/{id}/status` | Get order status | Planned |
 
 ## Inventory Service
 
