@@ -72,13 +72,49 @@ services:
   postgres-notification:
     image: postgres:18
     environment:
-      POSTGRES_DB: notification_db
+      POSTGRES_DB: meridian_notification
       POSTGRES_USER: meridian
       POSTGRES_PASSWORD: changeme
     ports:
       - "5434:5432"
     volumes:
       - postgres-notification-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meridian"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-notification:5432/meridian_notification
+      SPRING_DATASOURCE_USERNAME: meridian
+      SPRING_DATASOURCE_PASSWORD: changeme
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: meridian
+      SPRING_RABBITMQ_PASSWORD: changeme
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: 1025
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
+    depends_on:
+      postgres-notification:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
 
   mongodb:
     image: mongo:8.0
