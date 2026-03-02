@@ -23,7 +23,7 @@ Meridian is a production-grade, event-driven microservices platform demonstratin
 - [x] **Order Service** -- REST API, Transactional Outbox Pattern, RabbitMQ producer, domain events, unit tests
 - [x] **API Gateway** -- Spring Cloud Gateway, JWT validation filter, rate limiting, circuit breakers
 - [x] **Inventory Service** -- MongoDB, event consumer, stock reservations, validation
-- [ ] **Notification Service** -- Email notifications, DLQ handling
+- [x] **Notification Service** -- Email notifications, DLQ handling
 - [ ] **Analytics Service** -- GraphQL, InfluxDB, time-series metrics
 - [x] **Shared Library** -- Centralized domain events and DTOs to enforce schema consistency
 
@@ -37,7 +37,7 @@ meridian-backend/
   order-service/           # Order management + outbox events
   api-gateway/             # Gateway with Resilience4j & Redis rate limiting
   inventory-service/       # Product catalog & stock reservation
-  notification-service/    # (planned) Async email
+  notification-service/    # Async email
   analytics-service/       # (planned) GraphQL metrics
   shared-lib/              # Shared types and domain events
   docs/                    # Architecture documentation
