@@ -8,8 +8,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Infrastructure adapter consuming InventoryReservedEvent messages from RabbitMQ
- * and delegating to the application use case.
+ * Asynchronous AMQP driving adapter capturing domain events broadcasted by the Inventory Service.
+ * Serves as the continuous ingestion tributary for inventory tracking.
  */
 @Component
 @RequiredArgsConstructor

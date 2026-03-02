@@ -11,8 +11,8 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * GraphQL resolver for order-related metric queries.
- * Acts as the presentation boundary for analytics data.
+ * Presentation layer GraphQL Controller specifically managing financial order aggregations.
+ * Maps schema definition queries directly into the core Application Use Cases.
  */
 @Controller
 @RequiredArgsConstructor

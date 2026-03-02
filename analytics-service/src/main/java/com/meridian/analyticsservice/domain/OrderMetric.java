@@ -10,8 +10,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Pure domain POJO representing an order metric data point.
- * No framework annotations -- domain remains clean.
+ * Pure domain POJO representing an isolated financial metric data point at a specific instant.
+ * Detached entirely from framework-specific routing or persistence annotations to adhere
+ * strictly to Clean Architecture bounds.
  */
 @Data
 @NoArgsConstructor

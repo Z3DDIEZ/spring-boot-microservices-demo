@@ -7,6 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Data Transfer Object (DTO) returned to the client upon successful
+ * authentication.
+ * Encapsulates the JWT Access Token, the long-lived Refresh Token, and user
+ * metadata
+ * to populate frontend state (username, roles).
+ */
 @Data
 @Builder
 @AllArgsConstructor

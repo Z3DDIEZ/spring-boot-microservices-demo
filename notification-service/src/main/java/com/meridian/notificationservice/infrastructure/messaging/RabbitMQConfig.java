@@ -11,6 +11,11 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Messaging architecture topology blueprints outlining exact queue semantics,
+ * exchanges,
+ * and resilient dead-letter routing rules specific to email triggers.
+ */
 @Configuration
 public class RabbitMQConfig {
 

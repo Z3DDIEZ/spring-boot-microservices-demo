@@ -50,6 +50,14 @@ public class Notification {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    /**
+     * Factory pattern to initiate a fresh outbound notification request.
+     * Sets the default bounded state to {@code PENDING}.
+     *
+     * @param recipientEmail The target email address.
+     * @param subject        The localized message subject line.
+     * @param body           The fully rendered text/HTML body.
+     */
     @Builder
     public Notification(String recipientEmail, String subject, String body) {
         this.recipientEmail = recipientEmail;
@@ -58,16 +66,29 @@ public class Notification {
         this.status = NotificationStatus.PENDING;
     }
 
+    /**
+     * JPA lifecycle hook capturing the exact instant the record is initially
+     * persisted.
+     */
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();
     }
 
+    /**
+     * Mutates state upon confirmed transmission by the physical infrastructure
+     * provider.
+     */
     public void markAsSent() {
         this.status = NotificationStatus.SENT;
         this.sentAt = Instant.now();
     }
 
+    /**
+     * Mutates state upon a hard terminal failure by the physical infrastructure
+     * provider.
+     * Usually flags the record for manual dead-letter queue resolution.
+     */
     public void markAsFailed() {
         this.status = NotificationStatus.FAILED;
     }

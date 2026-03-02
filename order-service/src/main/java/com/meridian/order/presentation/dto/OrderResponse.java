@@ -14,8 +14,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Outgoing DTO representing a complete order with its line items.
- * Domain entities are never exposed directly in REST payloads.
+ * Structured Outbound DTO representing an explicit cross-section of an Order's
+ * finalized
+ * lifecycle point.
+ * <p>
+ * Implemented intentionally to prevent direct bleeding of Hibernate Proxy
+ * properties
+ * directly to REST/GraphQL interfaces.
  */
 @Data
 @NoArgsConstructor

@@ -8,8 +8,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Infrastructure adapter consuming OrderCreatedEvent messages from RabbitMQ
- * and delegating to the application use case.
+ * Asynchronous AMQP driving adapter capturing domain events broadcasted by the Order Service.
+ * Serves as the continuous ingestion tributary for financial and sales tracking.
  */
 @Component
 @RequiredArgsConstructor

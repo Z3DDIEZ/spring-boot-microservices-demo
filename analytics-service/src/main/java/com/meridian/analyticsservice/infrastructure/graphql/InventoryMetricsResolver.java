@@ -11,8 +11,8 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * GraphQL resolver for inventory-related metric queries.
- * Acts as the presentation boundary for inventory analytics data.
+ * Presentation layer GraphQL Controller specifically managing inventory-oriented aggregations.
+ * Maps schema definition queries directly into the core Application Use Cases.
  */
 @Controller
 @RequiredArgsConstructor

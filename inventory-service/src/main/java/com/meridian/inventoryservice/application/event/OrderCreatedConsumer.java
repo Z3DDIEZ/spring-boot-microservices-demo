@@ -11,6 +11,15 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * AMQP Consumer asynchronously listening for globally broadcast "Order Created"
+ * integration events.
+ * <p>
+ * This represents the trigger sequence for the local Inventory Saga. It
+ * effectively
+ * decouples the tight HTTP bindings between the Order and Inventory boundary
+ * contexts.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -18,6 +27,14 @@ public class OrderCreatedConsumer {
 
     private final InventoryService inventoryService;
 
+    /**
+     * Primary message handler executing upon the arrival of a serialized domain
+     * event.
+     * Decodes the payload and orchestrates the localized stock reservation logic.
+     *
+     * @param event The structured event payload containing items requiring
+     *              fulfillment.
+     */
     @RabbitListener(queues = "${app.rabbitmq.queue.order-created}")
     public void handleOrderCreated(OrderCreatedEvent event) {
         log.info("Received OrderCreatedEvent for Order ID: {}", event.getOrderId());

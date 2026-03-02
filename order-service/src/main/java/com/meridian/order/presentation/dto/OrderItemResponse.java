@@ -9,7 +9,10 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
- * Outgoing DTO representing a single line item within an order.
+ * Outbound DTO detailing an inherent, finalized line item encapsulated within
+ * an Order.
+ * Purposely strips out bidirectional parent references to avoid cyclic
+ * serialization bombs.
  */
 @Data
 @NoArgsConstructor

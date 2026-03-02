@@ -16,6 +16,13 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * Solidifies the Inventory Service as a rigid, stateless OAuth2 Resource
+ * Server.
+ * Enforces inbound requests to provide valid Bearer tokens natively verified
+ * using
+ * the globally shared HMAC-256 Secret Key.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -27,18 +34,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/actuator/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                    .decoder(jwtDecoder())
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                )
-            );
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .decoder(jwtDecoder())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         return http.build();
     }

@@ -15,6 +15,22 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    /**
+     * Constructs the primary {@link SecurityFilterChain} for the microservice.
+     * <ul>
+     * <li>Globally disables CSRF protection (acceptable for stateless APIs).</li>
+     * <li>Enforces session management as purely
+     * {@link SessionCreationPolicy#STATELESS}.</li>
+     * <li>Intercepts all routes starting with {@code /api/**} and enforces valid
+     * OAuth2 Bearer Tokens.</li>
+     * <li>Leaves Actuator endpoints open for infrastructure probes
+     * (Kubernetes/Docker).</li>
+     * </ul>
+     *
+     * @param http The HTTP Security builder context.
+     * @return The finalized filter chain.
+     * @throws Exception If an error occurs compiling the configuration block.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http

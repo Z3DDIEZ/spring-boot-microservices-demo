@@ -13,10 +13,11 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 /**
- * Application use case orchestrator.
- * Receives domain events from infrastructure consumers, maps them to
- * domain metrics, and delegates to the MetricsWriter port.
- * Provides query methods that delegate to the MetricsReader port.
+ * Centralized Application Use Case orchestrator for metric aggregation.
+ * <p>
+ * Receives primitive domain events originating from detached RabbitMQ consumers, translates them 
+ * into bounded Context domain metrics, and immediately delegates to the {@link MetricsWriter} port.
+ * Exposes mirrored query delegation methods leveraging the {@link MetricsReader} port.
  */
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,12 @@ public class AnalyticsService {
 
     // --- Write Use Cases (invoked by RabbitMQ consumers) ---
 
+    /**
+     * Deconstructs a broadcast 'OrderCreated' payload into a flattened timeseries metric.
+     * Enforces the translation of local Server times into strictly bounded UTC Instants.
+     *
+     * @param event The volatile event originating from the distributed message broker.
+     */
     public void recordOrderMetric(OrderCreatedEvent event) {
         log.info("Recording order metric for order: {}", event.getOrderId());
 
@@ -44,6 +51,12 @@ public class AnalyticsService {
         metricsWriter.writeOrderMetric(metric);
     }
 
+    /**
+     * Deconstructs a broadcast 'InventoryReserved' payload into a flattened timeseries metric.
+     * Enforces the translation of local Server times into strictly bounded UTC Instants.
+     *
+     * @param event The volatile event originating from the distributed message broker.
+     */
     public void recordInventoryMetric(InventoryReservedEvent event) {
         log.info("Recording inventory metric for order: {}, product: {}",
                 event.getOrderId(), event.getProductId());

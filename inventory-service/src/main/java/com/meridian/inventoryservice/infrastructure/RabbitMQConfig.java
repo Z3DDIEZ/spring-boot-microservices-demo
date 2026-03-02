@@ -9,6 +9,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Structural configurations to connect this isolated MongoDB environment
+ * directly
+ * to the distributed RabbitMQ event backbone.
+ * <p>
+ * Ensures the Inventory Service can asynchronously hear about "Order Created"
+ * scenarios
+ * without synchronous API bottlenecking.
+ */
 @Configuration
 public class RabbitMQConfig {
 

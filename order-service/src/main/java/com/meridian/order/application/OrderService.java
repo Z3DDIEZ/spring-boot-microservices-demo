@@ -19,6 +19,16 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Core Application Service orchestrating complex business use cases for Orders.
+ * <p>
+ * This boundary class manages transactional integrity across the internal Order
+ * state
+ * and the outbox pattern. It translates raw DTO inputs into domain concepts and
+ * guarantees
+ * domain events are safely staged for future broadcast without distributed
+ * transaction overhead.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -29,14 +39,19 @@ public class OrderService {
     private final ObjectMapper objectMapper;
 
     /**
-     * Creates a new Order, saves it to the DB, and generates the corresponding
-     * DomainEvent
-     * into the Outbox table within a single atomic transaction.
+     * Creates a new Order, saves it to the database, and safely persists the
+     * corresponding
+     * {@link OrderCreatedEvent} into the Outbox table within a single atomic
+     * database transaction.
+     * <p>
+     * This achieves strict eventual consistency with downstream microservices (like
+     * Inventory).
      *
-     * @param userId       the authenticated user placing the order
-     * @param itemRequests the line items with product, quantity, and price
-     *                     information
-     * @return the persisted Order entity
+     * @param userId       the authenticated logical user placing the order.
+     * @param itemRequests the requested line items containing product IDs,
+     *                     quantities, and prices.
+     * @return the completely persisted and versioned Order entity.
+     * @throws RuntimeException if Jackson fails to serialize the outbox payload.
      */
     @Transactional
     public Order createOrder(UUID userId, List<OrderItemInput> itemRequests) {

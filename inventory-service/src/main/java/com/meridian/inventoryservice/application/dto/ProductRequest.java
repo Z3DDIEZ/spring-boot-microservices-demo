@@ -9,6 +9,12 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+/**
+ * Inbound DTO blueprint encapsulating the strict Java Bean Validation rules
+ * for registering new sellable catalog entities.
+ * <p>
+ * Guards against malicious inputs (e.g. negative prices or stock quantities).
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +26,7 @@ public class ProductRequest {
     private String name;
 
     private String description;
-    
+
     @NotBlank(message = "Category is required")
     private String categoryId;
 

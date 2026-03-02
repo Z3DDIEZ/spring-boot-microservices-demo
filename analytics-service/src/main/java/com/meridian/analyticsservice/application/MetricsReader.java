@@ -7,8 +7,8 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Port interface for reading metric data points from the time-series store.
- * Implemented by an InfluxDB adapter in the infrastructure layer.
+ * Architectural inbound port explicitly defining the contract for executing historical 
+ * queries against the underlying time-series data store (InfluxDB).
  */
 public interface MetricsReader {
 

@@ -8,7 +8,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 /**
- * Concrete implementation of the EmailSender port using Spring's JavaMailSender.
+ * Concrete implementation of the EmailSender port using Spring's
+ * JavaMailSender.
  * Resides in infrastructure as it handles external integration.
  */
 @Component
@@ -18,6 +19,17 @@ public class EmailSenderImpl implements EmailSender {
 
     private final JavaMailSender javaMailSender;
 
+    /**
+     * Physically transmits an SMTP payload to external mail relays using Spring's
+     * JavaMail.
+     * <p>
+     * <i>Note:</i> In advanced setups, this would implement backoff algorithms and
+     * circuit breakers.
+     *
+     * @param to      The target recipient string.
+     * @param subject The email header subject.
+     * @param body    The unformatted string payload representing the message body.
+     */
     @Override
     public void sendEmail(String to, String subject, String body) {
         log.debug("Preparing email to: {}, Subject: {}", to, subject);

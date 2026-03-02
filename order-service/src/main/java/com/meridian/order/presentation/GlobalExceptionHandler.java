@@ -21,7 +21,12 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     /**
-     * Handles Bean Validation failures (e.g. missing fields, invalid ranges).
+     * Intercepts and parses JSR-380 Bean Validation failures (e.g., missing fields,
+     * invalid mathematical ranges).
+     *
+     * @param ex The native Spring validation exception.
+     * @return HTTP 400 Bad Request containing a structured array of targeted field
+     *         errors.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
@@ -44,7 +49,12 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles resource-not-found scenarios.
+     * Handles programmatic requests to retrieve entities that strictly do not exist
+     * in the database.
+     *
+     * @param ex The native NoSuchElementException thrown by repository unwrapping
+     *           failures.
+     * @return HTTP 404 Not Found standard response envelope.
      */
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(NoSuchElementException ex) {
@@ -58,7 +68,11 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Catch-all for unexpected server errors.
+     * Ultimate catch-all safety net for unpredictable, untamed server faults.
+     * Purposely obfuscates deep internal stack traces from the client.
+     *
+     * @param ex Any uncaught Java application exception.
+     * @return HTTP 500 Internal Server Error standard response envelope.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {

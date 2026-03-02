@@ -19,8 +19,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Implements the MetricsReader port using InfluxDB Flux queries.
- * Flux is InfluxDB 2.x's query language for aggregating and transforming time-series data.
+ * Concrete implementation of the {@link MetricsReader} architectural port.
+ * <p>
+ * Translates abstract, domain-agnostic query parameters into highly optimized 
+ * native InfluxDB Flux language queries, extracting and hydrating clean domain objects.
  */
 @Component
 @Slf4j

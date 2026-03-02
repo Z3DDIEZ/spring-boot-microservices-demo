@@ -5,19 +5,31 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
+/**
+ * Configuration class for defining rate limiting strategies within the API
+ * Gateway.
+ * Uses Spring Cloud Gateway's built-in Redis Rate Limiter mechanism.
+ */
 @Configuration
 public class RateLimitConfig {
 
     /**
-     * Resolves the key to use for rate limiting. 
-     * Here we resolve by the client's IP address.
-     * Alternatively, this could extract a user ID from the Principal.
+     * Defines the key used contextually by the Redis Rate Limiter to track quotas.
+     * <p>
+     * This implementation resolves the rate-limiting key based on the client's IP
+     * address.
+     * In a production environment with authenticated users, this could be adapted
+     * to extract
+     * a User ID or Tenant ID from the JWT token via the
+     * {@link java.security.Principal}.
+     *
+     * @return A {@link KeyResolver} that emits the client's IP address as a string.
      */
     @Bean
     public KeyResolver remoteAddressKeyResolver() {
         return exchange -> Mono.just(
-                exchange.getRequest().getRemoteAddress() != null ? 
-                exchange.getRequest().getRemoteAddress().getAddress().getHostAddress() : "unknown"
-        );
+                exchange.getRequest().getRemoteAddress() != null
+                        ? exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
+                        : "unknown");
     }
 }

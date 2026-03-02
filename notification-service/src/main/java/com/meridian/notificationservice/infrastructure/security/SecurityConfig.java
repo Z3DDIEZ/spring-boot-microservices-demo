@@ -10,6 +10,12 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Locks down the microservice presentation perimeter.
+ * Because Notification Service strictly operates off internal message queues,
+ * practically all native HTTP ingress paths (aside from health actuators) are
+ * permanently denied.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -23,8 +29,7 @@ public class SecurityConfig {
                         // Allow actuator health checks
                         .requestMatchers("/actuator/health", "/actuator/prometheus").permitAll()
                         // Block literally everything else (this service is purely async/headless)
-                        .anyRequest().denyAll()
-                );
+                        .anyRequest().denyAll());
 
         return http.build();
     }

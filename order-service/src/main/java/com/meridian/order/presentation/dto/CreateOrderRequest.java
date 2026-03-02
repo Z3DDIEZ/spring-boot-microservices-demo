@@ -14,7 +14,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Incoming DTO for creating a new order via POST /api/v1/orders.
+ * Inbound Request DTO capturing the blueprint for a desired new order.
+ * Serves as the primary validation gatekeeper, ensuring logical completeness
+ * using Spring/Jakarta validation constructs prior to engaging the application
+ * layer.
  */
 @Data
 @NoArgsConstructor
@@ -25,6 +28,10 @@ public class CreateOrderRequest {
     @Valid
     private List<OrderItemRequest> items;
 
+    /**
+     * Nested inner class capturing individual line items within the macro order
+     * blueprint.
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

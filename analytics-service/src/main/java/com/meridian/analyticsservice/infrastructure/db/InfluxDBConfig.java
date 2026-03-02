@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Produces the InfluxDB client bean from application.yml properties.
+ * Centralized configuration orchestrating the low-level connection pool 
+ * to the external InfluxDB timeseries database instance.
  */
 @Configuration
 public class InfluxDBConfig {

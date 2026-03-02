@@ -12,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Implements the MetricsWriter port using InfluxDB's WriteApiBlocking.
- * Each metric is written as a Point with tags (indexed) and fields (values).
+ * Concrete implementation of the {@link MetricsWriter} architectural port.
+ * <p>
+ * Responsible for mapping clean domain metric objects into raw InfluxDB {@link Point} 
+ * structures, dictating measurement boundaries, dimensional tags, and field values.
  */
 @Component
 @RequiredArgsConstructor

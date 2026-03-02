@@ -11,6 +11,10 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Advanced messaging topology blueprints configuring isolated, durable consumer queues, 
+ * explicitly binding the Analytics Service to existing enterprise domain exchanges.
+ */
 @Configuration
 public class RabbitMQConfig {
 

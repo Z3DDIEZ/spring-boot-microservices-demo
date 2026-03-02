@@ -26,59 +26,63 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final OrderService orderService;
+        private final OrderService orderService;
 
-    /**
-     * Creates a new order for the authenticated user.
-     *
-     * @param jwt     the decoded JWT principal injected by Spring Security
-     * @param request the validated request body containing order items
-     * @return 201 Created with the persisted OrderResponse
-     */
-    @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(
-            @AuthenticationPrincipal Jwt jwt,
-            @Valid @RequestBody CreateOrderRequest request) {
+        /**
+         * Creates a new logical order belonging to the authenticated principal.
+         * Transforms and parses JSON payload rules into resilient data inputs.
+         *
+         * @param jwt     the valid decoded JWT principal injected by Spring Security.
+         * @param request the validated monolithic request body detailing product IDs
+         *                and configurations.
+         * @return HTTP 201 Created with the strictly populated OrderResponse entity
+         *         state.
+         */
+        @PostMapping
+        public ResponseEntity<OrderResponse> createOrder(
+                        @AuthenticationPrincipal Jwt jwt,
+                        @Valid @RequestBody CreateOrderRequest request) {
 
-        UUID userId = UUID.fromString(jwt.getSubject());
+                UUID userId = UUID.fromString(jwt.getSubject());
 
-        List<OrderService.OrderItemInput> items = request.getItems().stream()
-                .map(i -> new OrderService.OrderItemInput(
-                        i.getProductId(), i.getQuantity(), i.getUnitPrice()))
-                .collect(Collectors.toList());
+                List<OrderService.OrderItemInput> items = request.getItems().stream()
+                                .map(i -> new OrderService.OrderItemInput(
+                                                i.getProductId(), i.getQuantity(), i.getUnitPrice()))
+                                .collect(Collectors.toList());
 
-        Order order = orderService.createOrder(userId, items);
-        return ResponseEntity.status(HttpStatus.CREATED).body(OrderResponse.fromEntity(order));
-    }
+                Order order = orderService.createOrder(userId, items);
+                return ResponseEntity.status(HttpStatus.CREATED).body(OrderResponse.fromEntity(order));
+        }
 
-    /**
-     * Lists all orders belonging to the authenticated user.
-     *
-     * @param jwt the decoded JWT principal
-     * @return 200 OK with a list of OrderResponse DTOs
-     */
-    @GetMapping
-    public ResponseEntity<List<OrderResponse>> getMyOrders(@AuthenticationPrincipal Jwt jwt) {
-        UUID userId = UUID.fromString(jwt.getSubject());
+        /**
+         * Lists all chronological orders historically transacted by the authenticated
+         * user.
+         *
+         * @param jwt the valid decoded JWT principal.
+         * @return HTTP 200 OK encompassing an array of flattened OrderResponse DTOs.
+         */
+        @GetMapping
+        public ResponseEntity<List<OrderResponse>> getMyOrders(@AuthenticationPrincipal Jwt jwt) {
+                UUID userId = UUID.fromString(jwt.getSubject());
 
-        List<OrderResponse> orders = orderService.getOrdersByUserId(userId).stream()
-                .map(OrderResponse::fromEntity)
-                .collect(Collectors.toList());
+                List<OrderResponse> orders = orderService.getOrdersByUserId(userId).stream()
+                                .map(OrderResponse::fromEntity)
+                                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(orders);
-    }
+                return ResponseEntity.ok(orders);
+        }
 
-    /**
-     * Retrieves a single order by its ID.
-     *
-     * @param id the order UUID path variable
-     * @return 200 OK with the OrderResponse, or 404 if not found
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrderById(@PathVariable UUID id) {
-        return orderService.getOrderById(id)
-                .map(OrderResponse::fromEntity)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+        /**
+         * Retrieves a single order by its ID.
+         *
+         * @param id the order UUID path variable
+         * @return 200 OK with the OrderResponse, or 404 if not found
+         */
+        @GetMapping("/{id}")
+        public ResponseEntity<OrderResponse> getOrderById(@PathVariable UUID id) {
+                return orderService.getOrderById(id)
+                                .map(OrderResponse::fromEntity)
+                                .map(ResponseEntity::ok)
+                                .orElse(ResponseEntity.notFound().build());
+        }
 }

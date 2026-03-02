@@ -13,6 +13,11 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * Configures the microservice as an OAuth2 Stateless Resource Server.
+ * Strictly enforces that all presentation-layer GraphQL interrogations 
+ * carry valid authenticated JWT context representing an authorized client or administrator.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

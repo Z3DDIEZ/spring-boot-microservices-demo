@@ -7,9 +7,24 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Spring Data JPA Repository managing the transactional outbox table.
+ * Critical component of the outbox pattern used to decouple local database
+ * transactions
+ * from the asynchronous message broker.
+ */
 @Repository
 public interface OutboxEventRepository extends JpaRepository<OutboxEvent, UUID> {
-    
-    // Finds up to 100 unpublished events, ordered by oldest first
+
+    /**
+     * Retrieves a batch of unprocessed outbox events that have yet to be shipped to
+     * RabbitMQ.
+     * <p>
+     * Capped to mitigate memory issues under heavy loads. Ordered chronologically
+     * to maintain
+     * FIFO event streaming guarantees where possible.
+     *
+     * @return A list of maximum 100 unpublished outbox entities.
+     */
     List<OutboxEvent> findTop100ByPublishedFalseOrderByCreatedAtAsc();
 }

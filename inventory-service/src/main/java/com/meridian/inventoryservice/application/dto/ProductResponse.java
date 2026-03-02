@@ -7,6 +7,12 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+/**
+ * Explicit Outbound DTO serving as a pristine presentation of a domain
+ * {@link Product}.
+ * Safely flattens the rich entity representation into primitive REST
+ * compatibility.
+ */
 @Data
 @Builder
 public class ProductResponse {

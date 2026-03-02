@@ -96,11 +96,22 @@ mvn test -pl order-service
 
 ## Documentation
 
+### High-Level Architecture
+
 - [Architecture Overview](docs/architecture-overview.md)
 - [Technology Stack](docs/technology-stack.md)
 - [API Contracts](docs/api-contracts.md)
 - [Event-Driven Patterns](docs/event-driven-patterns.md)
 - [Observability Guide](docs/observability-guide.md)
+
+### Internal Codebase Documentation
+
+A comprehensive Javadoc site is generated during the build process to document domain invariants, application use cases, and infrastructure bindings.
+
+To view the generated Java API documentation:
+
+1. Run `mvn clean compile javadoc:aggregate` from the project root.
+2. Open `target/site/apidocs/index.html` in your web browser.
 
 ## License
 

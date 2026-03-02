@@ -17,6 +17,14 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Core Application Service administering product catalog integrity and
+ * inventory allocations.
+ * <p>
+ * Centralizes business operations involving catalog alterations and safe,
+ * concurrent
+ * stock deductions required by upstream order fulfillment.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -25,6 +33,15 @@ public class InventoryService {
     private final ProductRepository productRepository;
     private final ReservationRepository reservationRepository;
 
+    /**
+     * Persists a newly defined product catalog entry.
+     * Enforces explicit business rules (e.g., SKU uniqueness).
+     *
+     * @param request The data payload containing product dimensions and initial
+     *                stock.
+     * @return A sanitized DTO response of the freshly created entity.
+     * @throws IllegalArgumentException If the provided SKU is already registered.
+     */
     @Transactional
     public ProductResponse createProduct(ProductRequest request) {
         log.info("Creating new product with SKU: {}", request.getSku());
@@ -46,12 +63,26 @@ public class InventoryService {
         return ProductResponse.fromEntity(savedProduct);
     }
 
+    /**
+     * Retrieves the entire existing product catalog.
+     * Note: In a production scale system, this route must introduce structured
+     * pagination.
+     *
+     * @return A list of all available product DTOs.
+     */
     public List<ProductResponse> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(ProductResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Lookups a specific catalog entry by its exact internal MongoDB identifier.
+     *
+     * @param id The String-based UUID/ObjectId of the product.
+     * @return The populated response DTO.
+     * @throws NoSuchElementException If the ID strictly yields no results.
+     */
     public ProductResponse getProductById(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Product not found with id: " + id));
@@ -59,8 +90,17 @@ public class InventoryService {
     }
 
     /**
-     * Attempts to reserve stock for a list of items associated with an order.
-     * Throws an exception if any item fails reservation.
+     * Core transactional choreography for the distributed Saga pattern.
+     * <p>
+     * Iteratively attempts to deduct stock across multiple independent products.
+     * If <i>any</i> singular product lacks sufficient stock, the entire MongoDB
+     * transaction aborts via Spring's declarative rollback mechanism.
+     *
+     * @param orderId        The UUID tracing the upstream order requesting the
+     *                       hold.
+     * @param itemsToReserve A Key-Value map dictating {@code {SKU : Quantity}}.
+     * @throws IllegalStateException    If a product is technically out of stock.
+     * @throws IllegalArgumentException If a requested SKU cannot be found.
      */
     @Transactional
     public void reserveStock(UUID orderId, Map<String, Integer> itemsToReserve) {

@@ -13,6 +13,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class OrderCreatedDlqConsumer {
 
+    /**
+     * Siphons irrevocably failed messages from the DLQ for ultimate analysis.
+     * Prevents poison-pill messages from indefinitely halting core queue
+     * processing.
+     *
+     * @param event The original event that exhausted normal delivery retries.
+     */
     @RabbitListener(queues = RabbitMQConfig.QUEUE_NOTIFICATION_ORDER_CREATED_DLQ)
     public void processFailedMessage(OrderCreatedEvent event) {
         log.error(
