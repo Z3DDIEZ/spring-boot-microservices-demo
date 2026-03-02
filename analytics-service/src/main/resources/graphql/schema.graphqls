@@ -1,0 +1,42 @@
+type Query {
+  """
+  Retrieve order metrics within a time range.
+  """
+  orderMetrics(start: String!, stop: String!): [OrderMetricResponse!]!
+
+  """
+  Retrieve inventory reservation metrics within a time range.
+  """
+  inventoryMetrics(start: String!, stop: String!): [InventoryMetricResponse!]!
+
+  """
+  Get total number of orders within a time range.
+  """
+  orderCount(start: String!, stop: String!): Long!
+
+  """
+  Get average order value (in currency units) within a time range.
+  """
+  averageOrderValue(start: String!, stop: String!): Float!
+}
+
+type OrderMetricResponse {
+  orderId: ID!
+  userId: ID!
+  totalAmount: Float!
+  itemCount: Int!
+  timestamp: String!
+}
+
+type InventoryMetricResponse {
+  orderId: ID!
+  productId: ID!
+  quantity: Int!
+  reservationStatus: String!
+  timestamp: String!
+}
+
+"""
+A 64-bit integer scalar.
+"""
+scalar Long

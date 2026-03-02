@@ -110,6 +110,28 @@ services:
       mailhog:
         condition: service_started
 
+  # Analytics Service
+  analytics-service:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: meridian
+      SPRING_RABBITMQ_PASSWORD: changeme
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: meridian-token
+      INFLUXDB_ORG: meridian
+      INFLUXDB_BUCKET: analytics
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
+    depends_on:
+      influxdb:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+
   mailhog:
     image: mailhog/mailhog
     ports:

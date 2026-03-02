@@ -1,0 +1,66 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: analytics-service
+
+  graphql:
+    graphiql:
+      enabled: true # Enables the GraphiQL UI at /graphiql
+    path: /graphql
+    schema:
+      locations: classpath:graphql/
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 1000ms
+          max-attempts: 3
+          multiplier: 2.0
+          max-interval: 10000ms
+        default-requeue-rejected: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+
+influxdb:
+  url: ${INFLUXDB_URL:http://localhost:8086}
+  token: ${INFLUXDB_TOKEN:meridian-token}
+  org: ${INFLUXDB_ORG:meridian}
+  bucket: ${INFLUXDB_BUCKET:analytics}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+
+logging:
+  level:
+    root: INFO
+    com.meridian: DEBUG
+    org.springframework.graphql: DEBUG
+    org.springframework.amqp: DEBUG
