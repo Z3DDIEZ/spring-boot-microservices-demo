@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-notification-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.services.notificationService.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-notification-service
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: "{{ .Values.services.notificationService.image }}:{{ .Values.services.notificationService.tag }}"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-config
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://{{ .Release.Name }}-postgres-notification-service:5432/meridian_notification"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: POSTGRES_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: POSTGRES_PASSWORD
+            - name: SPRING_RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: RABBITMQ_USERNAME
+            - name: SPRING_RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: RABBITMQ_PASSWORD
+            - name: SPRING_MAIL_HOST
+              value: "{{ .Release.Name }}-mailhog-service"
+            - name: SPRING_MAIL_PORT
+              value: "1025"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: JWT_SECRET
+            - name: JAVA_TOOL_OPTIONS
+              value: {{ .Values.services.notificationService.javaOptions | quote }}
+          ports:
+            - containerPort: 8084
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8084
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8084
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-notification-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+    - port: 8084
+      targetPort: 8084
+  selector:
+    app: {{ .Release.Name }}-notification-service
+---
+# Mailhog Deployment for Helm
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-mailhog
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-mailhog
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-mailhog
+    spec:
+      containers:
+        - name: mailhog
+          image: mailhog/mailhog
+          ports:
+            - containerPort: 1025
+            - containerPort: 8025
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-mailhog-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+    - port: 1025
+      name: smtp
+    - port: 8025
+      name: web
+  selector:
+    app: {{ .Release.Name }}-mailhog

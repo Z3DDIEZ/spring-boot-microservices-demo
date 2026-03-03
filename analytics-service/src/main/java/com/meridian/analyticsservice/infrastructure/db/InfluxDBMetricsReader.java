@@ -7,7 +7,7 @@ import com.influxdb.query.FluxTable;
 import com.meridian.analyticsservice.application.MetricsReader;
 import com.meridian.analyticsservice.domain.InventoryMetric;
 import com.meridian.analyticsservice.domain.OrderMetric;
-import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -21,8 +21,9 @@ import java.util.UUID;
 /**
  * Concrete implementation of the {@link MetricsReader} architectural port.
  * <p>
- * Translates abstract, domain-agnostic query parameters into highly optimized 
- * native InfluxDB Flux language queries, extracting and hydrating clean domain objects.
+ * Translates abstract, domain-agnostic query parameters into highly optimized
+ * native InfluxDB Flux language queries, extracting and hydrating clean domain
+ * objects.
  */
 @Component
 @Slf4j
@@ -32,7 +33,7 @@ public class InfluxDBMetricsReader implements MetricsReader {
     private final String bucket;
 
     public InfluxDBMetricsReader(InfluxDBClient influxDBClient,
-                                  @Qualifier("influxBucket") String bucket) {
+            @Qualifier("influxBucket") String bucket) {
         this.influxDBClient = influxDBClient;
         this.bucket = bucket;
     }
@@ -41,9 +42,9 @@ public class InfluxDBMetricsReader implements MetricsReader {
     public List<OrderMetric> getOrderMetrics(Instant start, Instant stop) {
         String flux = String.format(
                 "from(bucket: \"%s\")" +
-                " |> range(start: %s, stop: %s)" +
-                " |> filter(fn: (r) => r._measurement == \"order_metrics\")" +
-                " |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")",
+                        " |> range(start: %s, stop: %s)" +
+                        " |> filter(fn: (r) => r._measurement == \"order_metrics\")" +
+                        " |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")",
                 bucket, start.toString(), stop.toString());
 
         log.debug("Executing Flux query for order metrics: {}", flux);
@@ -72,9 +73,9 @@ public class InfluxDBMetricsReader implements MetricsReader {
     public List<InventoryMetric> getInventoryMetrics(Instant start, Instant stop) {
         String flux = String.format(
                 "from(bucket: \"%s\")" +
-                " |> range(start: %s, stop: %s)" +
-                " |> filter(fn: (r) => r._measurement == \"inventory_metrics\")" +
-                " |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")",
+                        " |> range(start: %s, stop: %s)" +
+                        " |> filter(fn: (r) => r._measurement == \"inventory_metrics\")" +
+                        " |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")",
                 bucket, start.toString(), stop.toString());
 
         log.debug("Executing Flux query for inventory metrics: {}", flux);
@@ -103,9 +104,9 @@ public class InfluxDBMetricsReader implements MetricsReader {
     public long getOrderCount(Instant start, Instant stop) {
         String flux = String.format(
                 "from(bucket: \"%s\")" +
-                " |> range(start: %s, stop: %s)" +
-                " |> filter(fn: (r) => r._measurement == \"order_metrics\" and r._field == \"totalAmount\")" +
-                " |> count()",
+                        " |> range(start: %s, stop: %s)" +
+                        " |> filter(fn: (r) => r._measurement == \"order_metrics\" and r._field == \"totalAmount\")" +
+                        " |> count()",
                 bucket, start.toString(), stop.toString());
 
         log.debug("Executing Flux query for order count: {}", flux);
@@ -124,9 +125,9 @@ public class InfluxDBMetricsReader implements MetricsReader {
     public double getAverageOrderValue(Instant start, Instant stop) {
         String flux = String.format(
                 "from(bucket: \"%s\")" +
-                " |> range(start: %s, stop: %s)" +
-                " |> filter(fn: (r) => r._measurement == \"order_metrics\" and r._field == \"totalAmount\")" +
-                " |> mean()",
+                        " |> range(start: %s, stop: %s)" +
+                        " |> filter(fn: (r) => r._measurement == \"order_metrics\" and r._field == \"totalAmount\")" +
+                        " |> mean()",
                 bucket, start.toString(), stop.toString());
 
         log.debug("Executing Flux query for average order value: {}", flux);

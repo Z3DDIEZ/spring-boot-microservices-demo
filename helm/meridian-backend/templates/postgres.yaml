@@ -1,0 +1,194 @@
+# postgres-auth
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-postgres-auth
+  namespace: {{ .Values.global.namespace }}
+spec:
+  serviceName: "{{ .Release.Name }}-postgres-auth-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-postgres-auth
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-postgres-auth
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.infrastructure.postgres.image | quote }}
+          env:
+            - name: POSTGRES_DB
+              value: "auth_db"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: POSTGRES_PASSWORD
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-auth-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-auth-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.infrastructure.postgres.storage }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-postgres-auth-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: {{ .Release.Name }}-postgres-auth
+---
+# postgres-order
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-postgres-order
+  namespace: {{ .Values.global.namespace }}
+spec:
+  serviceName: "{{ .Release.Name }}-postgres-order-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-postgres-order
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-postgres-order
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.infrastructure.postgres.image | quote }}
+          env:
+            - name: POSTGRES_DB
+              value: "order_db"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: POSTGRES_PASSWORD
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-order-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-order-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.infrastructure.postgres.storage }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-postgres-order-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: {{ .Release.Name }}-postgres-order
+---
+# postgres-notification
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-postgres-notification
+  namespace: {{ .Values.global.namespace }}
+spec:
+  serviceName: "{{ .Release.Name }}-postgres-notification-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-postgres-notification
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-postgres-notification
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.infrastructure.postgres.image | quote }}
+          env:
+            - name: POSTGRES_DB
+              value: "meridian_notification"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: POSTGRES_PASSWORD
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-notification-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-notification-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.infrastructure.postgres.storage }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-postgres-notification-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: {{ .Release.Name }}-postgres-notification

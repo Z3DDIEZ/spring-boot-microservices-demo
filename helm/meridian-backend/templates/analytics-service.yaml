@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-analytics-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.services.analyticsService.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-analytics-service
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-analytics-service
+    spec:
+      containers:
+        - name: analytics-service
+          image: "{{ .Values.services.analyticsService.image }}:{{ .Values.services.analyticsService.tag }}"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-config
+          env:
+            - name: SPRING_RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: RABBITMQ_USERNAME
+            - name: SPRING_RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: RABBITMQ_PASSWORD
+            - name: INFLUXDB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: INFLUXDB_TOKEN
+            - name: INFLUXDB_ORG
+              value: "meridian"
+            - name: INFLUXDB_BUCKET
+              value: "analytics"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: JWT_SECRET
+            - name: JAVA_TOOL_OPTIONS
+              value: {{ .Values.services.analyticsService.javaOptions | quote }}
+          ports:
+            - containerPort: 8085
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8085
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8085
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-analytics-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+    - port: 8085
+      targetPort: 8085
+  selector:
+    app: {{ .Release.Name }}-analytics-service

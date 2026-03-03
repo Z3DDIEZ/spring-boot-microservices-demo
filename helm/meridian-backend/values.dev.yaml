@@ -1,0 +1,25 @@
+global:
+  springProfilesActive: "dev"
+  
+services:
+  apiGateway:
+    replicas: 1
+    javaOptions: "-Xmx128m"
+  authService:
+    replicas: 1
+    javaOptions: "-Xmx128m"
+  orderService:
+    replicas: 1
+    javaOptions: "-Xmx128m"
+  inventoryService:
+    replicas: 1
+    javaOptions: "-Xmx128m"
+  notificationService:
+    replicas: 1
+    javaOptions: "-Xmx128m"
+  analyticsService:
+    replicas: 1
+    javaOptions: "-Xmx128m"
+
+# In dev, we can use slightly smaller PVCs if needed, 
+# but the defaults in values.yaml are already small enough.

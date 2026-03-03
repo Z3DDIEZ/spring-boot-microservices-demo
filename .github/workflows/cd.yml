@@ -1,0 +1,53 @@
+name: Meridian Continuous Deployment
+
+on:
+  workflow_run:
+    workflows: ["Spring Boot Microservices CI"]
+    types:
+      - completed
+    branches:
+      - main
+
+env:
+  KUBE_NAMESPACE: meridian
+
+jobs:
+  deploy-to-k8s:
+    name: Deploy Helm Chart to Kubernetes
+    runs-on: ubuntu-latest
+    # Only deploy if the CI build was successful
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4.2.0
+
+      - name: Configure Kubernetes Context
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+          
+      - name: Get current image SHA
+        id: image_tag
+        run: echo "TAG=sha-${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+
+      - name: Deploy application using Helm
+        run: |
+          helm upgrade --install meridian-backend ./helm/meridian-backend \
+            --namespace ${{ env.KUBE_NAMESPACE }} \
+            --create-namespace \
+            --values ./helm/meridian-backend/values.prod.yaml \
+            --set services.apiGateway.tag=${{ steps.image_tag.outputs.TAG }} \
+            --set services.authService.tag=${{ steps.image_tag.outputs.TAG }} \
+            --set services.orderService.tag=${{ steps.image_tag.outputs.TAG }} \
+            --set services.inventoryService.tag=${{ steps.image_tag.outputs.TAG }} \
+            --set services.notificationService.tag=${{ steps.image_tag.outputs.TAG }} \
+            --set services.analyticsService.tag=${{ steps.image_tag.outputs.TAG }}
+
+      - name: Verify Deployment
+        run: |
+          kubectl get pods -n ${{ env.KUBE_NAMESPACE }}

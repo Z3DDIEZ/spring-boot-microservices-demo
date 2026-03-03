@@ -2,7 +2,7 @@ package com.meridian.inventoryservice.application.event;
 
 import com.meridian.inventoryservice.application.InventoryService;
 import com.meridian.shared.domain.event.OrderCreatedEvent;
-import com.meridian.inventoryservice.application.dto.OrderItemDto;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

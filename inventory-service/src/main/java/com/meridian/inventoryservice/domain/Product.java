@@ -17,7 +17,6 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.UUID;
 
 /**
  * Core domain aggregate representing a physical or digital, sellable item in

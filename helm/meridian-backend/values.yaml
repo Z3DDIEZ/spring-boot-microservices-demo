@@ -1,0 +1,73 @@
+# Default values for meridian-backend.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  namespace: meridian
+  springProfilesActive: "prod"
+  jwtSecret: "MjAyNk1lcmlkaWFuQmFja2VuZE1hc3RlclNlY3JldEtleVN1cGVyU2FmZQ=="
+  
+  credentials:
+    postgresUser: "meridian"
+    postgresPassword: "changeme"
+    mongoUsername: "meridian"
+    mongoPassword: "changeme"
+    rabbitmqUsername: "meridian"
+    rabbitmqPassword: "changeme"
+    influxdbToken: "meridian-token"
+    influxdbInitPassword: "changeme123"
+
+ingress:
+  enabled: true
+  className: "nginx"
+
+services:
+  apiGateway:
+    image: "ghcr.io/z3ddiez/meridian-api-gateway"
+    tag: "latest"
+    replicas: 1
+    javaOptions: "-Xmx256m"
+  authService:
+    image: "ghcr.io/z3ddiez/meridian-auth-service"
+    tag: "latest"
+    replicas: 1
+    javaOptions: "-Xmx256m"
+  orderService:
+    image: "ghcr.io/z3ddiez/meridian-order-service"
+    tag: "latest"
+    replicas: 1
+    javaOptions: "-Xmx256m"
+  inventoryService:
+    image: "ghcr.io/z3ddiez/meridian-inventory-service"
+    tag: "latest"
+    replicas: 1
+    javaOptions: "-Xmx256m"
+  notificationService:
+    image: "ghcr.io/z3ddiez/meridian-notification-service"
+    tag: "latest"
+    replicas: 1
+    javaOptions: "-Xmx256m"
+  analyticsService:
+    image: "ghcr.io/z3ddiez/meridian-analytics-service"
+    tag: "latest"
+    replicas: 1
+    javaOptions: "-Xmx256m"
+
+infrastructure:
+  postgres:
+    image: "postgres:18"
+    storage: "1Gi"
+  mongodb:
+    image: "mongo:8.0"
+    storage: "2Gi"
+  redis:
+    image: "redis:8-alpine"
+    storage: "500Mi"
+  rabbitmq:
+    image: "rabbitmq:4-management"
+    storage: "2Gi"
+  influxdb:
+    image: "influxdb:2"
+    storage: "1Gi"
+  jaeger:
+    image: "jaegertracing/all-in-one:2.15"

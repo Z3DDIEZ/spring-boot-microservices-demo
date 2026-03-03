@@ -1,0 +1,34 @@
+global:
+  springProfilesActive: "prod"
+  
+services:
+  apiGateway:
+    replicas: 2
+    javaOptions: "-Xmx512m"
+  authService:
+    replicas: 3
+    javaOptions: "-Xmx512m"
+  orderService:
+    replicas: 3
+    javaOptions: "-Xmx512m"
+  inventoryService:
+    replicas: 2
+    javaOptions: "-Xmx512m"
+  notificationService:
+    replicas: 2
+    javaOptions: "-Xmx512m"
+  analyticsService:
+    replicas: 2
+    javaOptions: "-Xmx512m"
+
+infrastructure:
+  postgres:
+    storage: "50Gi"
+  mongodb:
+    storage: "50Gi"
+  redis:
+    storage: "10Gi"
+  rabbitmq:
+    storage: "50Gi"
+  influxdb:
+    storage: "100Gi"
