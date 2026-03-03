@@ -1,3 +1,7 @@
+# Note: This workflow is a portfolio demonstration modeled for managed Cloud Kubernetes clusters (AWS EKS, Azure AKS, Google GKE).
+# It uses a GitHub-hosted runner (`ubuntu-latest`) which cannot natively route traffic to a local `localhost`
+# Docker Desktop or k3s cluster behind a home NAT. To deploy locally, configure a self-hosted runner.
+
 name: Meridian Continuous Deployment
 
 on:
