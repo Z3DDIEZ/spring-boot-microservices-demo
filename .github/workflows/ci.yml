@@ -63,7 +63,7 @@ jobs:
 
       # Need to rebuild JARs since this is a new runner (or we could use artifacts)
       - name: Build JARs
-        run: mvn clean package -DskipTests -pl shared-lib,${{ matrix.service }}
+        run: mvn clean package -DskipTests -pl shared-lib,${{ matrix.service }} -am
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
