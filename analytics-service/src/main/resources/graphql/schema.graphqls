@@ -12,7 +12,7 @@ type Query {
   """
   Get total number of orders within a time range.
   """
-  orderCount(start: String!, stop: String!): Long!
+  orderCount(start: String!, stop: String!): Float!
 
   """
   Get average order value (in currency units) within a time range.
@@ -35,8 +35,3 @@ type InventoryMetricResponse {
   reservationStatus: String!
   timestamp: String!
 }
-
-"""
-A 64-bit integer scalar.
-"""
-scalar Long

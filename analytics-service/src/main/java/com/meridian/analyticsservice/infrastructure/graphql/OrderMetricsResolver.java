@@ -11,7 +11,8 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Presentation layer GraphQL Controller specifically managing financial order aggregations.
+ * Presentation layer GraphQL Controller specifically managing financial order
+ * aggregations.
  * Maps schema definition queries directly into the core Application Use Cases.
  */
 @Controller
@@ -26,8 +27,8 @@ public class OrderMetricsResolver {
     }
 
     @QueryMapping
-    public long orderCount(@Argument String start, @Argument String stop) {
-        return analyticsService.getOrderCount(Instant.parse(start), Instant.parse(stop));
+    public double orderCount(@Argument String start, @Argument String stop) {
+        return (double) analyticsService.getOrderCount(Instant.parse(start), Instant.parse(stop));
     }
 
     @QueryMapping
