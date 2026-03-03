@@ -85,3 +85,25 @@ Metrics & Monitoring:
 
 Logging: SLF4J + Logback (Spring Boot default)
 ```
+
+## Deployment & Orchestration
+
+```yaml
+Orchestration: Kubernetes 1.30+
+  - Ingress: Nginx Ingress Controller
+  - Service Discovery: K8s Native (ClusterIP & DNS)
+
+Package Management: Helm 3.x
+  - Chart: meridian-backend (consolidated chart)
+  - Environments: values.dev.yaml, values.prod.yaml
+
+Containerization: Docker (Eclipse Temurin JRE base images)
+```
+
+## CI/CD Pipeline
+
+```yaml
+CI/CD Platform: GitHub Actions
+  - CI Workflow: Maven Build, Unit Tests, Docker Image Build & Push (to GHCR)
+  - CD Workflow: Helm Upgrade on successful main branch merge
+```

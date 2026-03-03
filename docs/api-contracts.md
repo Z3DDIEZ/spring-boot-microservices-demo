@@ -1,5 +1,7 @@
 # API Contracts
 
+> **Note on Routing**: In the Kubernetes deployment, all external traffic hits the Nginx Ingress Controller, which terminates TLS and routes to the Spring Cloud API Gateway. The Gateway then routes to the respective microservices using Kubernetes internal DNS (`http://auth-service:8081`, etc.).
+
 ## Auth Service
 
 **Purpose**: OAuth2 authorization server; issues JWT tokens, manages user authentication, handles refresh tokens.

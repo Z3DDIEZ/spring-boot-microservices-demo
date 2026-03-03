@@ -50,7 +50,7 @@ Client → Gateway (Trace ID: abc123)
   └─→ Notification Service (Trace ID: abc123, Span ID: span4)
 ```
 
-**Jaeger UI**: Accessible at `http://localhost:16686` during local development.
+**Jaeger UI**: Accessible at `http://localhost:16686` during local development (via Docker Compose) or by running `kubectl port-forward svc/jaeger 16686:16686 -n meridian` in the Kubernetes ecosystem.
 
 ## Metrics Collection
 

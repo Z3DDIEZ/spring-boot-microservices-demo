@@ -35,9 +35,9 @@ public class OrderCreatedConsumer {
         // hitting auth-service,
         // storing email on order, OR embedding it in the domain event payload.
         // For simplicity in this demo without blocking cross-service calls, we'll dummy
-        // an email if missing
-        // or expect the Order payload to eventually carry contact info.
-        // TODO: In a real system, the event might carry customerEmail.
+        // an email if missing or expect the Order payload to eventually carry contact
+        // info.
+
         String destinationEmail = "customer-" + event.getUserId() + "@example.com";
 
         notificationService.sendOrderConfirmation(destinationEmail, event.getOrderId().toString());

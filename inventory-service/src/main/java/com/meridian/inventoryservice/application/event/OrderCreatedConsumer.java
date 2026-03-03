@@ -48,14 +48,8 @@ public class OrderCreatedConsumer {
         try {
             inventoryService.reserveStock(event.getOrderId(), itemsToReserve);
             log.info("Stock reservation completed for Order ID: {}", event.getOrderId());
-
-            // TODO: In a full saga, we would publish an InventoryReservedEvent here
-
         } catch (Exception e) {
             log.error("Failed to process stock reservation for Order ID: {}", event.getOrderId(), e);
-            // TODO: In a full saga, we would publish an InventoryFailedEvent here to
-            // trigger compensation
-            // Note: By throwing the exception, the message will go back to the queue or DLQ
             throw e;
         }
     }

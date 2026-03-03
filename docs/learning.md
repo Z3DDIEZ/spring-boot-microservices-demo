@@ -14,7 +14,7 @@ Read this document alongside the code. When you add a new class, update this doc
 
 1. [System Architecture — The Big Picture](#1-system-architecture--the-big-picture)
 2. [Maven Multi-Module Reactor](#2-maven-multi-module-reactor)
-3. [Docker Compose — Infrastructure as Code](#3-docker-compose--infrastructure-as-code)
+3. [Infrastructure: Docker Compose & Kubernetes](#3-infrastructure-docker-compose--kubernetes)
 4. [Architectural Philosophy: Event-Driven Microservices](#4-architectural-philosophy-event-driven-microservices)
 5. [The Clean Architecture Paradigm](#5-the-clean-architecture-paradigm)
 6. [Auth Service Deep Dive](#6-auth-service-deep-dive)
@@ -118,9 +118,13 @@ This means the child inherits: the Spring Boot plugin configuration, the Java co
 
 ---
 
-## 3. Docker Compose — Infrastructure as Code
+## 3. Infrastructure: Docker Compose & Kubernetes
 
-### What `docker-compose.yml` Does
+### Docker Compose vs. Kubernetes
+
+While `docker-compose.yml` is maintained for rapid local development of infrastructure dependencies (running just the databases or broker), the entire Meridian ecosystem is designed to run in **Kubernetes** via Helm charts.
+
+During the Phase 4 Kubernetes deployment, the infrastructure transitioned from a monolithic `docker-compose` to a consolidated Helm chart (`meridian-backend`).
 
 The `docker-compose.yml` at the root defines all infrastructure dependencies as reproducible containers. When you run `docker compose up -d auth-db order-db rabbitmq`, Docker pulls the correct images and starts PostgreSQL and RabbitMQ with the exact configuration the services expect — no local installation of PostgreSQL required, no version mismatch with a colleague's machine.
 
@@ -136,9 +140,26 @@ The `docker-compose.yml` at the root defines all infrastructure dependencies as 
 
 All containers in a `docker-compose.yml` share a default bridge network and can reach each other by their service name. The `order-service` application.yml connects to `jdbc:postgresql://order-db:5432/orderdb` — `order-db` resolves to the PostgreSQL container's IP on the bridge network. This is why service names in `docker-compose.yml` must match the hostnames configured in each service's `application.yml`.
 
-### Health Checks
+### Health Checks & K8s Probes
 
-Production-grade Docker Compose configurations define `healthcheck` entries on each dependency container, and application services declare `depends_on` with `condition: service_healthy`. This prevents the Spring Boot application from starting before PostgreSQL is ready to accept connections — a common source of startup failures in containerised environments.
+Production-grade Docker Compose configurations define `healthcheck` entries. In Kubernetes, this is replaced by **Liveness and Readiness Probes**. Spring Boot's actuator exposes `/actuator/health/liveness` and `/actuator/health/readiness`. Spring Boot 3 applications require generous `initialDelaySeconds` (e.g., 150s) in local clusters to account for the JVM start mapping, especially when resource-constrained.
+
+### Kubernetes Native Service Discovery vs. Eureka
+
+Spring Cloud Netflix Eureka is a standard service registry, but in a Kubernetes environment, it is redundant. Kubernetes provides native service discovery via internal DNS and `ClusterIP` services.
+
+Meridian explicitly disables Eureka (`EUREKA_CLIENT_ENABLED: "false"`) and instead uses Kubernetes DNS. The API Gateway routes are statically defined using the `SPRING_APPLICATION_JSON` environment variable to point directly to downstream K8s services (e.g., `http://auth-service:8080`). This eliminates the need for a separate Eureka Server pod and simplifies the architecture by delegating DNS to the orchestration layer.
+
+### The Docker Desktop Resource Constraint (OOMKilled)
+
+A critical learning from deploying the full 15+ pod cluster locally was managing JVM heap memory against Docker Desktop's VM memory limits.
+
+By default, Java ergonomics might allocate 25% of the machine's RAM to a container if limits aren't respected. When spinning up 6 Spring Boot microservices simultaneously alongside PostgreSQL, MongoDB, RabbitMQ, and InfluxDB on a machine with 16GB RAM, the OS invokes the OOM Killer, terminating pods with `Exit Code 137` (OOMKilled) or `CrashLoopBackOff`.
+
+**The Fix:**
+
+1. Explicitly setting JVM heap limits via the `JAVA_TOOL_OPTIONS` environment variable: `-Xmx256m`. This tells the JVM to strictly bound its heap size, allowing all microservices to coexist.
+2. Increasing the Docker Engine VM memory allocation to 10-12GB to ensure enough physical overhead is present to maintain cluster stability during concurrent startup spikes.
 
 ---
 

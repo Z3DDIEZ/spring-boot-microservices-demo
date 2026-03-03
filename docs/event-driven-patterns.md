@@ -51,6 +51,8 @@ public void publishPendingEvents() {
 }
 ```
 
+> **Kubernetes Scaling Note**: In a multi-replica Kubernetes deployment of `order-service`, having multiple pods polling the same `outbox_events` table simultaneously can lead to duplicate event publishing. To make this production-ready for horizontal scaling, a distributed lock (e.g., Spring Integration Redis Lock or ShedLock) must be applied to the `@Scheduled` method to ensure only one pod executes the publisher loop at a time.
+
 ## Domain Events
 
 These are the core domain events published by the Order Service to the `orders.exchange` (topic).

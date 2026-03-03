@@ -15,7 +15,8 @@ Meridian is a production-grade, event-driven microservices platform demonstratin
 | Data (SQL)       | PostgreSQL 18.x, Spring Data JPA              |
 | Data (NoSQL)     | MongoDB 8.0.x (planned)                       |
 | Observability    | Micrometer, Prometheus, Jaeger, OpenTelemetry |
-| Containerisation | Docker Compose                                |
+| Containerisation | Docker, Kubernetes (K3s/Minikube)             |
+| CI/CD & Deploy   | GitHub Actions, Helm                          |
 
 ## Current Progress
 
@@ -80,18 +81,35 @@ meridian-backend/
 
 ## Running Locally
 
-**Prerequisites**: Java 21, Maven 3.9+, Docker (for infrastructure containers)
+**Prerequisites**: Java 21, Maven 3.9+, Docker, Kubernetes (Docker Desktop/Minikube/K3s), Helm 3
+
+### Option A: Docker Compose (Infrastructure Only)
+
+Useful for running just the databases and building the apps in your IDE:
 
 ```bash
-# Start infrastructure (PostgreSQL, RabbitMQ)
-docker compose up -d auth-db order-db rabbitmq
+# Start infrastructure (PostgreSQL, RabbitMQ, etc.)
+docker compose up -d
 
 # Compile all active modules
 mvn compile
+```
 
-# Run tests
-mvn test -pl auth-service
-mvn test -pl order-service
+### Option B: Full Kubernetes Deployment (Helm)
+
+Deploys the entire microservice ecosystem and infrastructure into a local K8s cluster. Note: requires at least 8GB+ RAM allocated to the Docker Engine.
+
+```bash
+# Deploy all services and infrastructure
+helm upgrade --install meridian-backend ./helm/meridian-backend \
+  --values ./helm/meridian-backend/values.dev.yaml \
+  --namespace meridian --create-namespace
+
+# Watch pods spin up
+kubectl get pods -n meridian -w
+
+# Test Gateway routing (once all pods are Running)
+curl http://localhost/actuator/health
 ```
 
 ## Documentation

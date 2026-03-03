@@ -8,8 +8,13 @@
 │                     (Postman, cURL, Integration Tests)                   │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
-                                 │ HTTPS
+                                 │ HTTP/HTTPS
                                  ▼
+                    ┌────────────────────────┐
+                    │  Nginx Ingress (K8s)   │
+                    └──────────┬─────────────┘
+                               │
+                               ▼
                     ┌────────────────────────┐
                     │   API Gateway          │
                     │   (Spring Cloud)       │
@@ -87,8 +92,10 @@ Order Service → RabbitMQ → Notification Service (Event: OrderConfirmed)
 Inventory Service → RabbitMQ → Analytics Service (Event: StockUpdated)
 ```
 
-### Service-to-Service (Internal APIs)
+### Kubernetes Service Discovery
 
 ```
-Order Service → Inventory Service (gRPC: Reserve Stock - future enhancement)
+API Gateway → Kubernetes DNS → Microservice (e.g. auth-service:8081)
 ```
+
+The system relies on native Kubernetes `ClusterIP` services rather than Spring Cloud Eureka. The API Gateway routes are statically defined via `SPRING_APPLICATION_JSON` pointing to internal K8s DNS addresses.
