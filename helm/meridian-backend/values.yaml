@@ -6,7 +6,7 @@ global:
   namespace: meridian
   springProfilesActive: "prod"
   jwtSecret: "MjAyNk1lcmlkaWFuQmFja2VuZE1hc3RlclNlY3JldEtleVN1cGVyU2FmZQ=="
-  
+
   credentials:
     postgresUser: "meridian"
     postgresPassword: "changeme"
@@ -70,4 +70,4 @@ infrastructure:
     image: "influxdb:2"
     storage: "1Gi"
   jaeger:
-    image: "jaegertracing/all-in-one:2.15"
+    image: "jaegertracing/all-in-one:latest"

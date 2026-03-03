@@ -31,6 +31,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
           ports:
             - containerPort: 5432
           volumeMounts:
@@ -96,6 +98,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
           ports:
             - containerPort: 5432
           volumeMounts:
@@ -161,6 +165,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
           ports:
             - containerPort: 5432
           volumeMounts:
