@@ -69,9 +69,9 @@ metadata:
   name: {{ .Release.Name }}-ingress
   namespace: {{ .Values.global.namespace }}
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingress.className | quote }}
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
+  ingressClassName: {{ .Values.ingress.className | quote }}
   rules:
     - http:
         paths:
