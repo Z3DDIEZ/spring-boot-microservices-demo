@@ -13,7 +13,8 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 
 /**
  * Global Security Configuration for the API Gateway using Spring WebFlux
@@ -76,7 +77,7 @@ public class SecurityConfig {
      */
     @Bean
     public ReactiveJwtDecoder reactiveJwtDecoder() {
-        byte[] keyBytes = java.util.Base64.getDecoder().decode(jwtSecret);
+        byte[] keyBytes = Base64.getDecoder().decode(jwtSecret);
         SecretKeySpec secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
         return NimbusReactiveJwtDecoder.withSecretKey(secretKey).build();
     }
@@ -92,9 +93,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // In production, replace with specific origins
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedOriginPatterns(List.of("*")); // In production, replace with specific origins
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
